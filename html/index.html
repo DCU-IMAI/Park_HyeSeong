@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+    <head> 
+        <title>node js body-pix</title>
+    </head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.0"></script>
+    <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+    <body>
+        <img id ="image" src="./image/image.jpeg">
+    </body>
+    <script>
+        console.log(new Date().getTime() + ' body-pix start')
+        // 거리 구하는 함수
+        function getDist( ax, ay, zx, zy ){
+            var dis_x = ax - zx;
+            var dix_y = ay - zy;
+            dist = Math.sqrt( Math.abs( dis_x * dis_x ) + Math.abs( dix_y * dix_y ) );
+            return dist;
+        }
+        // img 매칭
+        const img = document.getElementById('image');
+        // body-pix
+        async function loadAndPredict() {
+            // dataset 설정 및 세부 설정
+            const net = await bodyPix.load({
+                architecture: 'ResNet50',
+                outputStride: 32,
+                quantBytes: 4
+            });
+            // segment 설정 및 body-pix 실행
+            const segmentation = await net.segmentMultiPersonParts(image, {
+                flipHorizontal: false,
+                internalResolution: 'medium',
+                segmentationThreshold: 0.7,
+                maxDetections: 1,
+                scoreThreshold: 0.2,
+                nmsRadius: 20,
+                minKeypointScore: 0.3,
+                refineSteps: 10
+            });
+            console.log(new Date().getTime() + ' run body-pix ')
+            seg = segmentation[0]
+            console.log('segmentation : ');
+            console.log(seg);
+            var arr = [0,0,0,0,0,0,0,0,0,0];
+            let top = -1;
+            let bottom = -1;
+            for (let i = 0; i < seg.height; i++) {
+                let head = 0;
+                let left_upper_arm = 0;
+                let right_upper_arm = 0;
+                let left_upper_leg = 0;
+                let right_upper_leg = 0;
+                let left_lower_leg = 0;
+                let right_lower_leg = 0;
+                let torso = 0;
+                let left_foot = 0;
+                let right_foot = 0;
+                for(let j = 0; j < seg.width; j++) {
+                    if(seg.data[seg.width*(i+1)+j] != -1 && top != -1) top = i;
+                    if(seg.data[seg.width*(i+1)+j] == 22 || seg.data[seg.width*(i+1)+j] == 23)
+                        bottom = i;
+                    switch(seg.data[seg.width*(i+1)+j]) {
+                        case -1 :
+                            break;
+                        case 0 :
+                        case 1 :
+                            head++;
+                            break;
+                        case 2 :
+                        case 3 :
+                            left_upper_arm++;
+                            break;
+                        case 4 :
+                        case 5 :
+                            right_upper_arm++;
+                            break;
+                        case 6 :
+                        case 7 :
+                            break;
+                        case 8 :
+                        case 9 :
+                            break;
+                        case 10 :
+                        case 11 :
+                            break;
+                        case 12 :
+                        case 13 :
+                            torso++;
+                            break;
+                        case 14 :
+                        case 15 :
+                            left_upper_leg++;
+                            break;
+                        case 16 :
+                        case 17 :
+                            right_upper_leg++;
+                            break;
+                        case 18 :
+                        case 19 :
+                            left_lower_leg++;
+                            break;
+                        case 20 :
+                        case 21 :
+                            right_lower_leg++;
+                            break;
+                        case 22 :
+                            left_foot++;
+                            break;
+                        case 23 :
+                            right_foot++;
+                            break;
+                    }
+                }
+                arr[0] = arr[0] < head ? head : arr[0];
+                arr[1] = arr[1] < left_upper_arm ? left_upper_arm : arr[1];
+                arr[2] = arr[2] < right_upper_arm ? right_upper_arm : arr[2];
+                arr[3] = arr[3] < left_upper_leg ? left_upper_leg : arr[3];
+                arr[4] = arr[4] < right_upper_leg ? right_upper_leg : arr[4];
+                arr[5] = arr[5] < left_lower_leg ? left_lower_leg : arr[5];
+                arr[6] = arr[6] < right_lower_leg ? right_lower_leg : arr[6];
+                arr[7] = arr[7] < torso ? torso : arr[7];
+                arr[8] = arr[8] < left_foot ? left_foot : arr[8];
+                arr[9] = arr[9] < right_foot ? right_foot : arr[9];
+            }
+            console.log(new Date().getTime() + ' Be measured in body part width')
+            $.ajax({
+                url : '/post',
+                datatype: 'json',
+                type: "POST",
+                data: {
+                    height : bottom - top,
+                    pose : {
+                        nose : {
+                            x : seg.pose.keypoints[0].position.x,
+                            y : seg.pose.keypoints[0].position.y,
+                            score : seg.pose.keypoints[0].score
+                        },
+                        leftEye : {
+                            x : seg.pose.keypoints[1].position.x,
+                            y : seg.pose.keypoints[1].position.y,
+                            score : seg.pose.keypoints[1].score
+                        },
+                        rightEye : {
+                            x : seg.pose.keypoints[2].position.x,
+                            y : seg.pose.keypoints[2].position.y,
+                            score : seg.pose.keypoints[2].score
+                        },
+                        leftEar : {
+                            x : seg.pose.keypoints[3].position.x,
+                            y : seg.pose.keypoints[3].position.y,
+                            score : seg.pose.keypoints[3].score
+                        },
+                        rightEar : {
+                            x : seg.pose.keypoints[4].position.x,
+                            y : seg.pose.keypoints[4].position.y,
+                            score : seg.pose.keypoints[4].score
+                        },
+                        leftShoulder : {
+                            x : seg.pose.keypoints[5].position.x,
+                            y : seg.pose.keypoints[5].position.y,
+                            score : seg.pose.keypoints[5].score
+                        },
+                        rightShoulder : {
+                            x : seg.pose.keypoints[6].position.x,
+                            y : seg.pose.keypoints[6].position.y,
+                            score : seg.pose.keypoints[6].score
+                        },
+                        leftElbow : {
+                            x : seg.pose.keypoints[7].position.x,
+                            y : seg.pose.keypoints[7].position.y,
+                            score : seg.pose.keypoints[7].score
+                        },
+                        rightElbow : {
+                            x : seg.pose.keypoints[8].position.x,
+                            y : seg.pose.keypoints[8].position.y,
+                            score : seg.pose.keypoints[8].score
+                        },
+                        leftWrist : {
+                            x : seg.pose.keypoints[9].position.x,
+                            y : seg.pose.keypoints[9].position.y,
+                            score : seg.pose.keypoints[9].score
+                        },
+                        rightWrist : {
+                            x : seg.pose.keypoints[10].position.x,
+                            y : seg.pose.keypoints[10].position.y,
+                            score : seg.pose.keypoints[10].score
+                        },
+                        leftHip : {
+                            x : seg.pose.keypoints[11].position.x,
+                            y : seg.pose.keypoints[11].position.y,
+                            score : seg.pose.keypoints[11].score
+                        },
+                        rightHip : {
+                            x : seg.pose.keypoints[12].position.x,
+                            y : seg.pose.keypoints[12].position.y,
+                            score : seg.pose.keypoints[12].score
+                        },
+                        leftKnee : {
+                            x : seg.pose.keypoints[13].position.x,
+                            y : seg.pose.keypoints[13].position.y,
+                            score : seg.pose.keypoints[13].score
+                        },
+                        rightKnee : {
+                            x : seg.pose.keypoints[14].position.x,
+                            y : seg.pose.keypoints[14].position.y,
+                            score : seg.pose.keypoints[14].score
+                        },
+                        leftAnkle : {
+                            x : seg.pose.keypoints[15].position.x,
+                            y : seg.pose.keypoints[15].position.y,
+                            score : seg.pose.keypoints[15].score
+                        },
+                        rightAnkle : {
+                            x : seg.pose.keypoints[16].position.x,
+                            y : seg.pose.keypoints[16].position.y,
+                            score : seg.pose.keypoints[16].score
+                        },
+                    },
+                    body : {
+                        head : {
+                            width : arr[0]
+                        },
+                        left_upper_arm : {
+                            width : arr[1],
+                            height : getDist(seg.pose.keypoints[5].position.x, seg.pose.keypoints[5].position.y,
+                            seg.pose.keypoints[7].position.x, seg.pose.keypoints[7].position.y)
+                        },
+                        right_upper_arm : {
+                            width : arr[2],
+                            height : getDist(seg.pose.keypoints[6].position.x, seg.pose.keypoints[6].position.y,
+                            seg.pose.keypoints[8].position.x, seg.pose.keypoints[8].position.y)
+                        },
+                        left_upper_leg : {
+                            width : arr[3],
+                            height : getDist(seg.pose.keypoints[11].position.x, seg.pose.keypoints[11].position.y,
+                            seg.pose.keypoints[13].position.x, seg.pose.keypoints[13].position.y)
+                        },
+                        right_upper_leg : {
+                            width : arr[4],
+                            height : getDist(seg.pose.keypoints[12].position.x, seg.pose.keypoints[12].position.y,
+                            seg.pose.keypoints[14].position.x, seg.pose.keypoints[14].position.y)
+                        },
+                        left_lower_leg : {
+                            width : arr[5],
+                            height : getDist(seg.pose.keypoints[13].position.x, seg.pose.keypoints[13].position.y,
+                            seg.pose.keypoints[15].position.x, seg.pose.keypoints[15].position.y)
+                        },
+                        right_lower_leg : {
+                            width : arr[6],
+                            height : getDist(seg.pose.keypoints[14].position.x, seg.pose.keypoints[14].position.y,
+                            seg.pose.keypoints[16].position.x, seg.pose.keypoints[16].position.y)
+                        },
+                        torso : {
+                            width : arr[7]
+                        },
+                        left_foot : {
+                            width : arr[8]
+                        },
+                        right_foot : {
+                            width : arr[9]
+                        }
+                    }
+                },
+                success: function(result) {
+                    if(result) console.log(new Date().getTime() + ' Post success!')
+                }
+            });
+            console.log(new Date().getTime() + ' End loadAndPredict')
+        }
+        loadAndPredict();
+    </script>
+</html>

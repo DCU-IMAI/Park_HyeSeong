@@ -1,0 +1,31 @@
+{
+  "name": "express",
+  "version": "1.0.0",
+  "description": "express test 1",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DCU-IMAI/Park_HyeSeong.git"
+  },
+  "keywords": [
+    "express"
+  ],
+  "author": "kblck",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DCU-IMAI/Park_HyeSeong/issues"
+  },
+  "homepage": "https://github.com/DCU-IMAI/Park_HyeSeong#readme",
+  "dependencies": {
+    "@tensorflow-models/body-pix": "^2.2.0",
+    "express": "^4.17.2",
+    "mysql": "^2.18.1"
+  },
+  "engines": {
+    "node": "^16",
+    "npm": "8.x.x"
+  }
+}

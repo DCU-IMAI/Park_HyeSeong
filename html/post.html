@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <form id = "postform" method = "POST" action = "/upload">
+            <input type="text" name="text" value="text">
+        </form>
+    </body>
+    <script>
+        temp = location.href.split("?");
+        segmentation = temp[1];
+        document.getElementById("text").appendChild(segmentation);
+    </script>
+</html>
