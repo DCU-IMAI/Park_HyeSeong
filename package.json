@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "express test 1",
   "main": "server.js",
+  "type" : "module",
   "scripts": {
     "start": "node server.js"
   },
@@ -21,11 +22,18 @@
   "homepage": "https://github.com/DCU-IMAI/Park_HyeSeong#readme",
   "dependencies": {
     "@tensorflow-models/body-pix": "^2.2.0",
-    "express": "^4.17.2",
-    "mysql": "^2.18.1"
+    "add": "^2.0.6",
+    "express": "^4.17.3",
+    "nvm": "^0.0.4",
+    "promise-mysql": "^5.1.0",
+    "telnet": "^0.0.1",
+    "yarn": "^1.22.18"
   },
   "engines": {
     "node": "^16",
     "npm": "8.x.x"
+  },
+  "devDependencies": {
+    "firebase": "^9.6.10"
   }
 }

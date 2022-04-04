@@ -39,10 +39,10 @@
                 minKeypointScore: 0.3,
                 refineSteps: 10
             });
-            console.log(new Date().getTime() + ' run body-pix ')
+            console.log(new Date().getTime() + ' end body-pix ')
             seg = segmentation[0]
-            console.log('segmentation : ');
-            console.log(seg);
+            //console.log('segmentation : ');
+            //console.log(seg);
             var arr = [0,0,0,0,0,0,0,0,0,0];
             let top = -1;
             let bottom = -1;
@@ -216,7 +216,7 @@
                             x : seg.pose.keypoints[16].position.x,
                             y : seg.pose.keypoints[16].position.y,
                             score : seg.pose.keypoints[16].score
-                        },
+                        }
                     },
                     body : {
                         head : {
