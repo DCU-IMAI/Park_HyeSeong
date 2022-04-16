@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.0"></script>
     <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
     <body>
-        <img id ="image" src="./image/image.jpeg">
+        <img id ="image" src="/image">
     </body>
     <script>
         console.log(new Date().getTime() + ' body-pix start')
@@ -41,11 +41,10 @@
             });
             console.log(new Date().getTime() + ' end body-pix ')
             seg = segmentation[0]
-            //console.log('segmentation : ');
-            //console.log(seg);
             var arr = [0,0,0,0,0,0,0,0,0,0];
             let top = -1;
             let bottom = -1;
+            //이미지 파일 분석
             for (let i = 0; i < seg.height; i++) {
                 let head = 0;
                 let left_upper_arm = 0;
@@ -125,12 +124,13 @@
                 arr[9] = arr[9] < right_foot ? right_foot : arr[9];
             }
             console.log(new Date().getTime() + ' Be measured in body part width')
+
+            //데이터 전송
             $.ajax({
                 url : '/post',
                 datatype: 'json',
                 type: "POST",
                 data: {
-                    height : bottom - top,
                     pose : {
                         nose : {
                             x : seg.pose.keypoints[0].position.x,
@@ -219,6 +219,7 @@
                         }
                     },
                     body : {
+                        height : bottom - top,
                         head : {
                             width : arr[0]
                         },
