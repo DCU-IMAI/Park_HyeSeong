@@ -38,12 +38,15 @@ router.post('/post', (req, res) => {
     let ratio = parseFloat(realheight) / parseFloat(data.height);
     console.log("ratio : " + ratio);
     readdata().then((snapshot) => {
+        // for 6420회 진행
         for(let i = 0; i < 6420; i++) {
+            //db 에서 값 추출
             var temp = {arm_height : snapshot.child(i+'/arm_height').val(), gender : snapshot.child(i+'/gender').val(), height : snapshot.child(i+'/height').val(), lower_leg_height : snapshot.child(i+'/lower_leg_height').val(),
             lower_leg_round : snapshot.child(i+'/lower_leg_round').val(),torso_width : snapshot.child(i+'/torso_width').val(),upper_arm_height : snapshot.child(i+'/upper_arm_height').val(),
             waist_round : snapshot.child(i+'/waist_round').val(),weight : snapshot.child(i+'/weight').val(), upper_leg_width : snapshot.child(i+'/upper_leg_width').val()};
                 console.log(i+"번째 callback 실행!");
                 
+                // 성별이 다르면 통과
                 if(gender != temp.gender) {
                     console.log("gender not eqqual");
                     continue;
@@ -89,6 +92,7 @@ router.post('/post', (req, res) => {
         console.log(index);
         data = req.body;
         temp = snapshot.child('/'+index);
+        //여기서 부터는 임시형식 json 저장 방식 X json 으로 통신할 예정
         var js = 
         {
             height : data.height,
