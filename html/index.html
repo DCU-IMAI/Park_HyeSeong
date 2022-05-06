@@ -124,6 +124,51 @@
                 arr[9] = arr[9] < right_foot ? right_foot : arr[9];
             }
             console.log(new Date().getTime() + ' Be measured in body part width')
+            console.log({
+                        height : bottom - top,
+                        head : {
+                            width : arr[0]
+                        },
+                        left_upper_arm : {
+                            width : arr[1],
+                            height : getDist(seg.pose.keypoints[5].position.x, seg.pose.keypoints[5].position.y,
+                            seg.pose.keypoints[7].position.x, seg.pose.keypoints[7].position.y)
+                        },
+                        right_upper_arm : {
+                            width : arr[2],
+                            height : getDist(seg.pose.keypoints[6].position.x, seg.pose.keypoints[6].position.y,
+                            seg.pose.keypoints[8].position.x, seg.pose.keypoints[8].position.y)
+                        },
+                        left_upper_leg : {
+                            width : arr[3],
+                            height : getDist(seg.pose.keypoints[11].position.x, seg.pose.keypoints[11].position.y,
+                            seg.pose.keypoints[13].position.x, seg.pose.keypoints[13].position.y)
+                        },
+                        right_upper_leg : {
+                            width : arr[4],
+                            height : getDist(seg.pose.keypoints[12].position.x, seg.pose.keypoints[12].position.y,
+                            seg.pose.keypoints[14].position.x, seg.pose.keypoints[14].position.y)
+                        },
+                        left_lower_leg : {
+                            width : arr[5],
+                            height : getDist(seg.pose.keypoints[13].position.x, seg.pose.keypoints[13].position.y,
+                            seg.pose.keypoints[15].position.x, seg.pose.keypoints[15].position.y)
+                        },
+                        right_lower_leg : {
+                            width : arr[6],
+                            height : getDist(seg.pose.keypoints[14].position.x, seg.pose.keypoints[14].position.y,
+                            seg.pose.keypoints[16].position.x, seg.pose.keypoints[16].position.y)
+                        },
+                        torso : {
+                            width : arr[7]
+                        },
+                        left_foot : {
+                            width : arr[8]
+                        },
+                        right_foot : {
+                            width : arr[9]
+                        }
+                    })
 
             //데이터 전송
             $.ajax({
